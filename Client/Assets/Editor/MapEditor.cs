@@ -11,7 +11,6 @@ public class MapEditor
 {
 
 #if UNITY_EDITOR
-    
     // % -> Ctrl # -> Shift & ->alt
     [MenuItem("Tools/Generate %#g")]
     private static void GenerateMap()
@@ -44,10 +43,6 @@ public class MapEditor
                 }
             }
         }
-        
-
-
-
     }
 
 #endif
