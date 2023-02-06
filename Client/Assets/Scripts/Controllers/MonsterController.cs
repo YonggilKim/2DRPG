@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using static Define;
 
-public class PlayerController : CreatureController
+public class MonsterController : CreatureController
 {
     #region 
+
     protected override void Init()
     {
         base.Init();
@@ -16,6 +16,11 @@ public class PlayerController : CreatureController
     {
         GetDirInput();
         base.UpdateController();
+    }
+
+    private void LateUpdate()
+    {
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     }
     #endregion
 
