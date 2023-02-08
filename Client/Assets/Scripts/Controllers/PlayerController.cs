@@ -17,6 +17,11 @@ public class PlayerController : CreatureController
         GetDirInput();
         base.UpdateController();
     }
+
+    private void LateUpdate()
+    {
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+    }
     #endregion
 
     #region Player Move Functions

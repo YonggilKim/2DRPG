@@ -7,7 +7,7 @@ public class CreatureController : MonoBehaviour
 {
     public float _speed = 5.0f;
 
-    protected Vector3Int _celPos = Vector3Int.zero;
+    public Vector3Int CellPos { get; set; } = Vector3Int.zero;
     protected Animator _animator;
     protected SpriteRenderer _sprite;
 
@@ -56,17 +56,13 @@ public class CreatureController : MonoBehaviour
         UpdateController();
     }
 
-    private void LateUpdate()
-    {
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
-    }
     #endregion
 
     protected virtual void Init()
     {
         _sprite = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
-        Vector3 pos = Managers.Map.CurrentGrid.CellToWorld(_celPos) + new Vector3(0.5f, 0.64f);
+        Vector3 pos = Managers.Map.CurrentGrid.CellToWorld(CellPos) + new Vector3(0.5f, 0.64f);
         transform.position = pos;
     }
 
@@ -91,10 +87,10 @@ public class CreatureController : MonoBehaviour
                     _sprite.flipX = false;
                     break;
                 case MoveDir.Left:
-                    _animator.Play("WALK_RIGHT");
+                    _animator.Play("IDLE_RIGHT");
                     _sprite.flipX = true;
                     break;
-                default:
+                case MoveDir.Right:
                     _animator.Play("IDLE_RIGHT");
                     _sprite.flipX = false;
                     break;
@@ -141,7 +137,7 @@ public class CreatureController : MonoBehaviour
     {
         if (State != CreatureState.Moving) return;
 
-        Vector3 destPos = Managers.Map.CurrentGrid.CellToWorld(_celPos) + new Vector3(0.5f, 0.64f);
+        Vector3 destPos = Managers.Map.CurrentGrid.CellToWorld(CellPos) + new Vector3(0.5f, 0.64f);
         Vector3 moveDir = destPos - transform.position;
 
         //도착 여부 체크
@@ -165,7 +161,7 @@ public class CreatureController : MonoBehaviour
     {
         if (State == CreatureState.Idle && _dir != MoveDir.None)
         {
-            Vector3Int destPos = _celPos;
+            Vector3Int destPos = CellPos;
             switch (Dir)
             {
                 case MoveDir.Up:
@@ -183,8 +179,11 @@ public class CreatureController : MonoBehaviour
             }
             if (Managers.Map.CanGo(destPos) == true)
             {
-                _celPos = destPos;
-                State = CreatureState.Moving;
+                if (Managers.Object.Find(destPos) == null)
+                { 
+                    State = CreatureState.Moving;
+                    CellPos = destPos;
+                }
             }
         }
     }

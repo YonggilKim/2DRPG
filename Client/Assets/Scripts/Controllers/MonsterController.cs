@@ -10,18 +10,15 @@ public class MonsterController : CreatureController
     protected override void Init()
     {
         base.Init();
+        State = CreatureState.Idle;
+        Dir = MoveDir.None;
     }
 
     protected override void UpdateController()
     {
-        GetDirInput();
         base.UpdateController();
     }
 
-    private void LateUpdate()
-    {
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
-    }
     #endregion
 
     #region Player Move Functions
