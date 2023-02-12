@@ -44,6 +44,7 @@ public class CreatureController : MonoBehaviour
         }
     }
 
+
     #region LifeCycle
     void Start()
     {
@@ -68,8 +69,23 @@ public class CreatureController : MonoBehaviour
 
     protected virtual void UpdateController()
     {
-        UpdateIsMoving();
-        UpdatePosition();
+        switch (State)
+        {
+            case CreatureState.Idle:
+                UpdateIdle();
+                break;
+            case CreatureState.Moving:
+                UpdateMoving();
+                break;
+            case CreatureState.Skill:
+                UpdateSkill();
+                break;
+            case CreatureState.Dead:
+                UpdateDead();
+                break;
+
+
+        }
     }
 
     protected virtual void UpdateAnimation()
@@ -123,7 +139,25 @@ public class CreatureController : MonoBehaviour
         }
         else if (_state == CreatureState.Skill)
         {
-            //TODO
+            switch (_lastDir)
+            {
+                case MoveDir.Up:
+                    _animator.Play("ATTACK_BACK");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Down:
+                    _animator.Play("ATTACK_FRONT");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Left:
+                    _animator.Play("ATTACK_RIGHT");
+                    _sprite.flipX = true;
+                    break;
+                case MoveDir.Right:
+                    _animator.Play("ATTACK_RIGHT");
+                    _sprite.flipX = false;
+                    break;
+            }
         }
         else
         {
@@ -132,32 +166,8 @@ public class CreatureController : MonoBehaviour
     }
 
     #region Player Move Functions
-    //셀단위로 스르르움직이는거 구현
-    void UpdatePosition()
-    {
-        if (State != CreatureState.Moving) return;
-
-        Vector3 destPos = Managers.Map.CurrentGrid.CellToWorld(CellPos) + new Vector3(0.5f, 0.64f);
-        Vector3 moveDir = destPos - transform.position;
-
-        //도착 여부 체크
-        float dist = moveDir.magnitude;
-        if (dist < _speed * Time.deltaTime)
-        {
-            transform.position = destPos;
-            State = CreatureState.Idle;
-            if (_dir == MoveDir.None)
-                UpdateAnimation();
-        }
-        else
-        {
-            transform.position += moveDir.normalized * _speed * Time.deltaTime;// 스르르움직임
-            State = CreatureState.Moving;
-        }
-
-    }
     //이동가능 상태일때 실제좌표로 이동
-    void UpdateIsMoving()
+    protected virtual void UpdateIdle()
     {
         if (State == CreatureState.Idle && _dir != MoveDir.None)
         {
@@ -186,6 +196,55 @@ public class CreatureController : MonoBehaviour
                 }
             }
         }
+    }
+    //셀단위로 스르르움직이는거 구현
+    protected virtual void UpdateMoving()
+    {
+        Vector3 destPos = Managers.Map.CurrentGrid.CellToWorld(CellPos) + new Vector3(0.5f, 0.64f);
+        Vector3 moveDir = destPos - transform.position;
+
+        //도착 여부 체크
+        float dist = moveDir.magnitude;
+        if (dist < _speed * Time.deltaTime)
+        {
+            transform.position = destPos;
+            State = CreatureState.Idle;
+            if (_dir == MoveDir.None)
+                UpdateAnimation();
+        }
+        else
+        {
+            transform.position += moveDir.normalized * _speed * Time.deltaTime;// 스르르움직임
+            State = CreatureState.Moving;
+        }
+
+    }
+    protected virtual void UpdateSkill()
+    { 
+    }
+    protected virtual void UpdateDead()
+    {
+    }
+    public Vector3Int GetFronCellPos()
+    {
+        Vector3Int cellPos = CellPos;
+
+        switch (_lastDir) 
+        {
+            case MoveDir.Up:
+                cellPos += Vector3Int.up;
+                break;
+            case MoveDir.Down:
+                cellPos += Vector3Int.down;
+                break;
+            case MoveDir.Left:
+                cellPos += Vector3Int.left;
+                break;
+            case MoveDir.Right:
+                cellPos += Vector3Int.right;
+                break;
+        }
+        return cellPos;
     }
     #endregion
 }
