@@ -210,7 +210,7 @@ namespace ServerCore
 						return;
 					}
 
-					// Read 커서 이동
+					// Read 커서 이동j
 					if (_recvBuffer.OnRead(processLen) == false)
 					{
 						Disconnect();
